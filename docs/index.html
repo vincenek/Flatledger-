@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FlatLedger Explorer</title>
+    <style>
+        body { font-family: monospace; max-width: 800px; margin: 0 auto; }
+        .tx { border: 1px solid #ccc; padding: 1rem; margin: 1rem 0; }
+    </style>
+</head>
+<body>
+    <h1>FlatLedger Explorer</h1>
+    <div id="ledger"></div>
+
+    <script>
+        async function loadLedger() {
+            const response = await fetch('../ledger.json');
+            const ledger = await response.json();
+            
+            let html = `<h3>Transactions (${ledger.transactions.length})</h3>`;
+            
+            ledger.transactions.forEach(tx => {
+                html += `
+                <div class="tx">
+                    <strong>${new Date(tx.timestamp).toLocaleString()}</strong><br>
+                    From: ${tx.sender.slice(0, 12)}...<br>
+                    To: ${tx.receiver.slice(0, 12)}...<br>
+                    Amount: ${tx.amount} ${tx.currency}<br>
+                    Hash: <code>${tx.tx_hash.slice(0, 24)}...</code>
+                </div>`;
+            });
+            
+            document.getElementById('ledger').innerHTML = html;
+        }
+        
+        loadLedger();
+        setInterval(loadLedger, 5000);
+    </script>
+</body>
+</html>
